@@ -24,4 +24,14 @@ Method ClearAll() [ WebMethod ]
 	Do ##class(WSDC.Data.Inventory).Init()
 }
 
+ClassMethod StartProduction() As %Status [ WebMethod ]
+{
+	Return ##class(Ens.Director).StartProduction("WSDC.Production.Production1")
+}
+
+ClassMethod StopProduction() As %Status [ WebMethod ]
+{
+	Return ##class(Ens.Director).StopProduction(,1)
+}
+
 }
