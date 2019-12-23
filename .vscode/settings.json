@@ -1,0 +1,6 @@
+{
+    "objectscript.conn.active": true,
+    "objectscript.conn.ns": "WSDC",
+    "objectscript.conn.password": "sys",
+    "objectscript.conn.port": 9205
+}
