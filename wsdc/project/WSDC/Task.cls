@@ -16,12 +16,13 @@ Method Test() As %String [ WebMethod ]
 	Return $ZDATETIME($h)
 }
 
-Method ClearAll() [ WebMethod ]
+Method ClearAll() As %Status [ WebMethod ]
 {
 	Do ##class(WSDC.Util).ClearAll()
 	
 	#;初期在庫の作成
 	Do ##class(WSDC.Data.Inventory).Init()
+	Return $$$OK
 }
 
 ClassMethod StartProduction() As %Status [ WebMethod ]
