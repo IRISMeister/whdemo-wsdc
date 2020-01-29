@@ -23,7 +23,7 @@ Method ReceiveDeliveryNote(req As MAKER.WS.DeliveryNoteContainer) As %Status [ W
 		For i=1:1:1 {
 			Set stmt(i)=##class(%SQL.Statement).%New()
 			Set tSC=stmt(i).%Prepare(sql(i))
-			If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+			$$$ThrowOnError(tSC)
 		}
 		Set rs=##class(%SQL.Statement).%ExecDirect(,"START TRANSACTION")
 
@@ -46,11 +46,7 @@ Method ReceiveDeliveryNote(req As MAKER.WS.DeliveryNoteContainer) As %Status [ W
 		
 	}
 	Catch e {
-		#;掛け捨てのロールバック
-		Set rs=##class(%SQL.Statement).%ExecDirect(,"ROLLBACK")
-		Do e.Log()
-		Set tSC = e.AsStatus()
-		$$$LOGERROR($SYSTEM.Status.GetErrorText(tSC))
+		$$$CATCH(e)
 	}
 	
 	Return tSC

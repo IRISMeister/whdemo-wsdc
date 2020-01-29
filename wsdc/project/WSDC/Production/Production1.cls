@@ -25,23 +25,26 @@ XData ProductionDefinition
     <Setting Target="Adapter" Name="CallInterval">30</Setting>
     <Setting Target="Host" Name="AlertOnError">1</Setting>
   </Item>
-  <Item Name="WSDC.Service.HQ" Category="" ClassName="WSDC.Service.HQ" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
+  <!-- Item Name="WSDC.Service.HQ" Category="" ClassName="WSDC.Service.HQ" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="AlertOnError">1</Setting>
-  </Item>
+  </Item -->
   <Item Name="WSDC.Service.Maker" Category="" ClassName="WSDC.Service.Maker" PoolSize="0" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="AlertOnError">1</Setting>
   </Item>
   <Item Name="Ens.Activity.Operation.Local" Category="" ClassName="Ens.Activity.Operation.Local" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="StorageNamespace">WSDC</Setting>
   </Item>
+  <Item Name="HQIn" Category="" ClassName="WSDC.Service.HQIn" PoolSize="0" Enabled="true" Foreground="false" Comment="本部から入荷オーダ受信" LogTraceEvents="false" Schedule="">
+  </Item>
+  <Item Name="HQOut" Category="" ClassName="WSDC.Service.HQOut" PoolSize="0" Enabled="true" Foreground="false" Comment="本部から出荷オーダ受信" LogTraceEvents="false" Schedule="">
+  </Item>
   <Item Name="HQ" Category="" ClassName="WSDC.Operation.HQ" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
-    <Setting Target="Adapter" Name="WebServiceURL">http://MACBETH:52773/csp/wshq/WSHQ.Service.DC.cls</Setting>
-    <Setting Target="Adapter" Name="SOAPCredentials">default</Setting>
-    <Setting Target="Adapter" Name="WebServiceClientClass">WSHQ.DC.WSHQ.DCSoap</Setting>
     <Setting Target="Host" Name="ReplyCodeActions">E=RD</Setting>
     <Setting Target="Host" Name="AlertOnError">1</Setting>
-    <Setting Target="Adapter" Name="ProxyPort"></Setting>
-    <Setting Target="Adapter" Name="ProxyServer"></Setting>
+    <Setting Target="Adapter" Name="HTTPPort">52773</Setting>
+    <Setting Target="Adapter" Name="HTTPServer">wshq</Setting>
+    <Setting Target="Adapter" Name="URL">/csp/wshq/dispatcher/Receive</Setting>
+    <Setting Target="Adapter" Name="Credentials">default</Setting>
   </Item>
   <Item Name="PickingCart" Category="" ClassName="WSDC.Operation.PickingCart" PoolSize="1" Enabled="true" Foreground="false" Comment="" LogTraceEvents="false" Schedule="">
     <Setting Target="Host" Name="AlertOnError">1</Setting>

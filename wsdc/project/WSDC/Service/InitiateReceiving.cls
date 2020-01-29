@@ -23,7 +23,7 @@ Method OnCalculateMetrics() As %Status
 		For i=1:1:7 {
 			Set stmt(i)=##class(%SQL.Statement).%New()
 			Set tSC=stmt(i).%Prepare(sql(i))
-			If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+			$$$ThrowOnError(tSC)
 		}
 
 		Set rs=##class(%SQL.Statement).%ExecDirect(,"SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
@@ -66,6 +66,8 @@ Method OnCalculateMetrics() As %Status
 			$$$SQLPREUPD(rs0,stmt(3),$$$SQLARGS(オーダ番号))
 			*/
 			
+			#;ここでlock取得タイムアウトが発生することがある。
+			#;エラー #5540: SQLCODE: -114 メッセージ: Unable to acquire shared lock on table WSDC_Data.Inventory for RowID value: 13
 			$$$SQLPREQUERY(rs(7),stmt(7),$$$SQLARGS(商品コード))
 			Set 実在庫=rs(7).実在庫
 			Set 理論在庫=rs(7).理論在庫
@@ -91,10 +93,7 @@ Method OnCalculateMetrics() As %Status
 		#;WSHQに入荷確定情報を送信
 		If container.Messages.Count()>0 {
 			Set tSC=..SendRequestAsync("HQ",container)
-			If $$$ISERR(tSC) {
-				#; throw
-				Throw ##class(%Exception.StatusException).CreateFromStatus(tSC)
-			}
+			$$$ThrowOnError(tSC)
 		}
 
 		#;見つかったレコードに合致するレコードを入荷オーダファイルから消しこむ
@@ -115,11 +114,7 @@ Method OnCalculateMetrics() As %Status
 		$$$LOGINFO("入荷検品処理実施:"_container.Messages.Count()_"件 経過(秒):"_(en-st))
 	}
 	Catch e {
-		#;掛け捨てのロールバック
-		Set rs0=##class(%SQL.Statement).%ExecDirect(,"ROLLBACK")
-		Do e.Log()
-		Set tSC = e.AsStatus()
-		$$$LOGERROR($SYSTEM.Status.GetErrorText(tSC))
+		$$$CATCH(e)
 	}
 
 	Set rs=##class(%SQL.Statement).%ExecDirect(,"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")

@@ -40,7 +40,6 @@ XData setup [ XMLNamespace = INSTALLER ]
 		<Arg Value="sys" />
 	</Invoke>
 	<Production Name="${ProductionName}" AutoStart="1">
-	<Setting  name="" Item="HQ" Target="Adapter" Setting="WebServiceURL" Value="http://wshq:${HTTPPORT}/csp/wshq/WSHQ.Service.DC.cls" />
 	</Production>
 </Namespace>
 </Manifest>
@@ -68,6 +67,17 @@ ClassMethod setup(ByRef tVars) As %Status
 		Set oldns=$NAMESPACE
 		New $NAMESPACE   ; just in case
 		Set $NAMESPACE="%SYS"
+
+		#; REST dispatcher
+		Set webapp="/csp/wsdc/dispatcher"
+		Set tSC = ##Class(Security.Applications).Create(webapp)
+		Set tSC = ##Class(Security.Applications).Get(webapp,.props)
+		Set props("DispatchClass")="WSDC.REST.Dispatcher"
+		Set props("Resource")=""
+		Set props("AutheEnabled")=32
+		Set props("NameSpace")=Namespace
+		Set props("IsNameSpaceDefault")=0
+		Set tSC = ##Class(Security.Applications).Modify(webapp,.props)
 
 		#; add an ECP Server definition
 		Kill Properties

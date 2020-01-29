@@ -15,11 +15,7 @@ Method OnCalculateMetrics() As %Status
 		$$$LOGINFO("統計情報更新 経過(秒):"_(en-st))
 	 }
 	 Catch e {
-		#;掛け捨てのロールバック
-		Set rs0=##class(%SQL.Statement).%ExecDirect(,"ROLLBACK")
-		Do e.Log()
-		Set tSC = e.AsStatus()
-		$$$LOGERROR($SYSTEM.Status.GetErrorText(tSC))
+		$$$CATCH(e)
 	 }
 	 
 	 Return tSC

@@ -32,7 +32,7 @@ Method OnCalculateMetrics() As %Status
 		For i=1:1:8 {
 			Set stmt(i)=##class(%SQL.Statement).%New()
 			Set tSC=stmt(i).%Prepare(sql(i))
-			If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+			$$$ThrowOnError(tSC)
 		}
 
 		Set rs=##class(%SQL.Statement).%ExecDirect(,"SET TRANSACTION ISOLATION LEVEL READ COMMITTED")
@@ -108,9 +108,9 @@ Method OnCalculateMetrics() As %Status
 		
 		#;送信失敗に備えて、Operationの再送機能を使用することを想定している。ReplyCodeActions: E=RD。再試行間隔,再試行タイムアウトを調整すること。
 		Set tSC=..SendRequestSync("PickingCart",pcContainer,.response) 	//カートに情報を送信
-		If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+		$$$ThrowOnError(tSC)
 		Set tSC=..SendRequestSync("MHE",mheContainer,.response) 	//マテハンに情報を送信
-		If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+		$$$ThrowOnError(tSC)
 
 		#;カート、マテハン双方へのデータ送信が成功した場合のみ、出荷オーダを削除する。		
 		$$$LOGINFO("出荷オーダを削除")

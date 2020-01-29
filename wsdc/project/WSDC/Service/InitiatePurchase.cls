@@ -6,12 +6,6 @@ Class WSDC.Service.InitiatePurchase Extends Ens.BusinessMetric
 
 Method OnCalculateMetrics() As %Status
 {
-	/*
-	Set req=##class(WSDC.Req.OnPurchase).%New()
-	Set tSC=..SendRequestSync("OnPurchase",req,.response)
-	Quit $$$OK
-	*/
-	
 	#dim rslt as %SQL.StatementResult
 	Set tSC=$$$OK
 	
@@ -23,7 +17,7 @@ Method OnCalculateMetrics() As %Status
 		For i=1:1:2 {
 			Set stmt(i)=##class(%SQL.Statement).%New()
 			Set tSC=stmt(i).%Prepare(sql(i))
-			If $$$ISERR(tSC) { Throw ##class(%Exception.StatusException).CreateFromStatus(tSC) }
+			$$$ThrowOnError(tSC)
 		}
 
 		Set pResponse=##class(Ens.Response).%New()
@@ -35,7 +29,7 @@ Method OnCalculateMetrics() As %Status
 		#; --扱う商品種類数を制限するため、暫定的にSQLを変更--
 
  		Set rs=##class(%SQL.Statement).%ExecDirect(,sql) Do rs.%Next() 
- 		If rs.%SQLCODE'=0,rs.%SQLCODE'=100 Write !,"SQLCODE:",rs.%SQLCODE," Error:",rs.%Message Throw ##class(%Exception.SQL).CreateFromSQLCODE(rs.SQLCODE,rs.%Message)
+ 		If rs.%SQLCODE'=0,rs.%SQLCODE'=100 Throw ##class(%Exception.SQL).CreateFromSQLCODE(rs.SQLCODE,rs.%Message)
 
 		Set today=##class(Common.Util).GetToday()
 		Set container=##class(WSHQ.DC.InboundOrderContainer).%New()
@@ -70,10 +64,13 @@ Method OnCalculateMetrics() As %Status
 				Set order."商品コード"=商品コード
 				Set order."数量"=数量
 				Do container.Messages.Insert(order)
-				#;$$$LOGINFO("発注オーダ作成 商品コード:"_商品コード_" 理論在庫+発注数:"_(理論在庫+発注数)_" 平均出庫量:"_平均出庫量_" リードタイム:"_リードタイム_" 発注点在庫量:"_発注点在庫量_" 安全在庫数:"_安全在庫数_" 発注数量:"_数量)
+				#;$$$LOGINFO("発注オーダ作成 商品コード:"_商品コード_" 理論在庫+発注数:"_(理論在庫+発注数)_" 実在庫+発注数:"_(実在庫+発注数)_" 平均出庫量:"_平均出庫量_" リードタイム:"_リードタイム_" 発注点在庫量:"_発注点在庫量_" 安全在庫数:"_安全在庫数_" 発注数量:"_数量)
 				
+				#;ここでlock取得タイムアウトが発生することがある。
+				#;エラー #5540: SQLCODE: -110 メッセージ: テーブル 'WSDC_Data.Inventory' の UPDATE のための RowID = '68' に対するロックが取得できません
 				#;該当商品の在庫管理台帳を更新
 				$$$SQLPREUPD(rs(1),stmt(1),$$$SQLARGS(today,$ZDATETIME($H,3),数量,商品コード))
+
 				#;発注の履歴を追加
 				$$$SQLPREUPD(rs(2),stmt(2),$$$SQLARGS(オーダ番号,オーダ日付,商品コード,数量,実在庫,理論在庫))
 
@@ -90,21 +87,14 @@ Method OnCalculateMetrics() As %Status
 		#;送信失敗した発注オーダを(復旧後の)WSHQに再送するために、Operationの再送機能を使用することを想定している。ReplyCodeActions: E=RD。再試行間隔,再試行タイムアウトを調整すること。
 		If container.Messages.Count()>0 {
 			Set tSC=..SendRequestAsync("HQ",container)
-			If $$$ISERR(tSC) {
-				#; throw
-				Throw ##class(%Exception.StatusException).CreateFromStatus(tSC)
-			}
+			$$$ThrowOnError(tSC)
 			Set en=$ZH
 			$$$LOGINFO("発注オーダ送信 :"_container.Messages.Count()_"件 経過(秒):"_(en-st))
 		}
 
 	}
 	Catch e {
-		#;掛け捨てのロールバック
-		Set rs=##class(%SQL.Statement).%ExecDirect(,"ROLLBACK")
-		Do e.Log()
-		Set tSC = e.AsStatus()
-		$$$LOGERROR($SYSTEM.Status.GetErrorText(tSC))
+		$$$CATCH(e)
 	}
 
 	 Return tSC
