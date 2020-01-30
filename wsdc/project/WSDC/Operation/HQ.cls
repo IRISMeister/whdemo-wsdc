@@ -45,7 +45,7 @@ Method DoInboundOrder(pRequest As WSHQ.DC.InboundOrderContainer, Output pRespons
 		$$$LOGINFO("本部に発注情報を送信:"_pRequest.Messages.Count()_"件 経過(秒):"_(en-st))
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 	Return tSC
 }
@@ -87,7 +87,7 @@ Method DoReceivingOrder(pRequest As WSHQ.DC.ReceivingOrderContainer, Output pRes
 		$$$LOGINFO("本部に入荷確定情報を送信:"_pRequest.Messages.Count()_"件 経過(秒):"_(en-st))
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 	Return tSC
 }

@@ -15,7 +15,7 @@ Method OnCalculateMetrics() As %Status
 		$$$LOGINFO("統計情報更新 経過(秒):"_(en-st))
 	 }
 	 Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	 }
 	 
 	 Return tSC

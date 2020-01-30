@@ -94,7 +94,7 @@ Method OnCalculateMetrics() As %Status
 
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 
 	 Return tSC

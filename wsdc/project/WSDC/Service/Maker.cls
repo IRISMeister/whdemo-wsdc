@@ -46,7 +46,7 @@ Method ReceiveDeliveryNote(req As MAKER.WS.DeliveryNoteContainer) As %Status [ W
 		
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 	
 	Return tSC

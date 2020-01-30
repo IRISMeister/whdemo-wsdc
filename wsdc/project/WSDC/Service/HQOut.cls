@@ -55,7 +55,7 @@ Method OnProcessInput(pInput As %RegisteredObject, pOutput As %RegisteredObject)
 		$$$LOGINFO("本部から出荷オーダファイル(当日分)受信:"_req.Count_"件 経過(秒):"_(en-st))
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 	Set resultContainer.Status=tSC
 	Do resultContainer.%ToJSON()

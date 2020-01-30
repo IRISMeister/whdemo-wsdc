@@ -114,7 +114,7 @@ Method OnCalculateMetrics() As %Status
 		$$$LOGINFO("入荷検品処理実施:"_container.Messages.Count()_"件 経過(秒):"_(en-st))
 	}
 	Catch e {
-		$$$CATCH(e)
+		$$$CATCH(e,tSC)
 	}
 
 	Set rs=##class(%SQL.Statement).%ExecDirect(,"SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED")
